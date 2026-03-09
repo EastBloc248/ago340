@@ -1,0 +1,1580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Diversity, Inequality and Injustice</title>
+  <meta name="description" content="Exploring how power, privilege and exclusion shape people's lives across different societies. A university creative assignment examining structural injustice and lived experience.">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- GSAP -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  
+  <style>
+    /* CSS Reset & Base */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    /* CSS Variables */
+    :root {
+      --background: #141414;
+      --foreground: #f5f5f5;
+      --card: #1f1f1f;
+      --card-foreground: #f5f5f5;
+      --muted: #404040;
+      --muted-foreground: #8c8c8c;
+      --accent: #e87b35;
+      --accent-foreground: #141414;
+      --border: #404040;
+      
+      --font-sans: 'IBM Plex Sans', sans-serif;
+      --font-mono: 'IBM Plex Mono', monospace;
+      --font-display: 'Bebas Neue', sans-serif;
+    }
+    
+    html {
+      scroll-behavior: smooth;
+      scrollbar-width: thin;
+      scrollbar-color: #3d3d3d #141414;
+    }
+    
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--background);
+      color: var(--foreground);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+    
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 10px; }
+    ::-webkit-scrollbar-track { background: #141414; }
+    ::-webkit-scrollbar-thumb { background: #3d3d3d; }
+    ::-webkit-scrollbar-thumb:hover { background: #525252; }
+    
+    /* Selection */
+    ::selection {
+      background: var(--accent);
+      color: var(--background);
+    }
+    
+    /* Grid Background */
+    .grid-bg {
+      position: fixed;
+      inset: 0;
+      opacity: 0.3;
+      pointer-events: none;
+      background-image: 
+        linear-gradient(to right, #333 1px, transparent 1px),
+        linear-gradient(to bottom, #333 1px, transparent 1px);
+      background-size: 60px 60px;
+      z-index: 0;
+    }
+    
+    /* Main Content */
+    .main-content {
+      position: relative;
+      z-index: 10;
+    }
+    
+    /* Side Navigation */
+    .side-nav {
+      position: fixed;
+      left: 0;
+      top: 0;
+      z-index: 50;
+      height: 100vh;
+      width: 80px;
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      border-right: 1px solid rgba(64, 64, 64, 0.3);
+      background: rgba(20, 20, 20, 0.8);
+      backdrop-filter: blur(8px);
+    }
+    
+    @media (min-width: 768px) {
+      .side-nav { display: flex; }
+    }
+    
+    .nav-items {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      padding: 16px;
+    }
+    
+    .nav-item {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+    }
+    
+    .nav-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: rgba(140, 140, 140, 0.4);
+      transition: all 0.3s ease;
+    }
+    
+    .nav-item:hover .nav-dot,
+    .nav-item.active .nav-dot {
+      background: var(--accent);
+      transform: scale(1.25);
+    }
+    
+    .nav-label {
+      position: absolute;
+      left: 24px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted-foreground);
+      opacity: 0;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+    
+    .nav-item:hover .nav-label {
+      opacity: 1;
+      left: 32px;
+    }
+    
+    .nav-item.active .nav-label {
+      color: var(--accent);
+    }
+    
+    /* Section Styles */
+    section {
+      padding: 128px 24px 128px 24px;
+    }
+    
+    @media (min-width: 768px) {
+      section {
+        padding-left: 112px;
+        padding-right: 48px;
+      }
+    }
+    
+    .section-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.3em;
+      color: var(--accent);
+    }
+    
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(3rem, 8vw, 5rem);
+      letter-spacing: -0.02em;
+      margin-top: 16px;
+      line-height: 1;
+    }
+    
+    /* Hero Section */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      position: relative;
+    }
+    
+    .hero-label {
+      position: absolute;
+      left: 24px;
+      top: 50%;
+      transform: translateY(-50%) rotate(-90deg);
+      transform-origin: left center;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.3em;
+      color: var(--muted-foreground);
+      white-space: nowrap;
+    }
+    
+    .hero-content {
+      flex: 1;
+      width: 100%;
+    }
+    
+    .split-flap-container {
+      margin-bottom: 16px;
+    }
+    
+    .split-flap-text {
+      font-family: var(--font-display);
+      font-size: clamp(4rem, 15vw, 12rem);
+      line-height: 0.9;
+      letter-spacing: -0.02em;
+    }
+    
+    .split-flap-char {
+      display: inline-block;
+      transition: transform 0.1s ease;
+    }
+    
+    .hero-description {
+      margin-top: 48px;
+      max-width: 32rem;
+      font-family: var(--font-mono);
+      font-size: 14px;
+      color: var(--muted-foreground);
+      line-height: 1.8;
+    }
+    
+    .hero-buttons {
+      margin-top: 64px;
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      flex-wrap: wrap;
+    }
+    
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 12px 24px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--foreground);
+      background: transparent;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+    
+    .btn-primary:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    
+    .btn-secondary {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted-foreground);
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+    
+    .btn-secondary:hover {
+      color: var(--foreground);
+    }
+    
+    .chevron {
+      width: 12px;
+      height: 12px;
+      border-right: 2px solid currentColor;
+      border-bottom: 2px solid currentColor;
+      transform: rotate(-45deg);
+      transition: transform 0.4s ease;
+    }
+    
+    .btn-primary:hover .chevron {
+      transform: rotate(0deg);
+    }
+    
+    .hero-tag {
+      position: absolute;
+      bottom: 32px;
+      right: 32px;
+      border: 1px solid var(--border);
+      padding: 8px 16px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted-foreground);
+    }
+    
+    @media (min-width: 768px) {
+      .hero-tag {
+        bottom: 48px;
+        right: 48px;
+      }
+    }
+    
+    /* About Section */
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 48px;
+      margin-top: 64px;
+    }
+    
+    @media (min-width: 768px) {
+      .about-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 96px;
+      }
+    }
+    
+    .about-text {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+    
+    .about-text p {
+      font-family: var(--font-mono);
+      font-size: 14px;
+      color: var(--muted-foreground);
+      line-height: 1.8;
+    }
+    
+    .focus-areas h3 {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.3em;
+      color: var(--muted-foreground);
+      margin-bottom: 24px;
+    }
+    
+    .focus-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    
+    .focus-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+    }
+    
+    .focus-number {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--accent);
+      margin-top: 4px;
+    }
+    
+    .focus-text {
+      font-family: var(--font-mono);
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.8);
+      transition: color 0.2s ease;
+    }
+    
+    .focus-item:hover .focus-text {
+      color: var(--accent);
+    }
+    
+    /* Themes Section */
+    .themes-container {
+      margin-top: 96px;
+      display: flex;
+      flex-direction: column;
+      gap: 96px;
+    }
+    
+    @media (min-width: 768px) {
+      .themes-container {
+        gap: 128px;
+      }
+    }
+    
+    .theme-item {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .theme-item.align-right {
+      align-items: flex-end;
+      text-align: right;
+    }
+    
+    .theme-item.align-left {
+      align-items: flex-start;
+      text-align: left;
+    }
+    
+    .theme-number {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.3em;
+      color: var(--muted-foreground);
+      margin-bottom: 16px;
+    }
+    
+    .theme-title {
+      font-family: var(--font-display);
+      font-size: clamp(2.5rem, 8vw, 6rem);
+      letter-spacing: -0.02em;
+      line-height: 1;
+    }
+    
+    .theme-title .highlight {
+      color: var(--accent);
+      position: relative;
+    }
+    
+    .theme-description {
+      margin-top: 24px;
+      max-width: 28rem;
+      font-family: var(--font-mono);
+      font-size: 14px;
+      color: var(--muted-foreground);
+      line-height: 1.8;
+    }
+    
+    .theme-divider {
+      margin-top: 32px;
+      height: 1px;
+      width: 96px;
+      background: var(--border);
+    }
+    
+    @media (min-width: 768px) {
+      .theme-divider {
+        width: 192px;
+      }
+    }
+    
+    /* Case Studies Section */
+    .case-studies-header {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 64px;
+    }
+    
+    @media (min-width: 768px) {
+      .case-studies-header {
+        flex-direction: row;
+        align-items: flex-end;
+        justify-content: space-between;
+      }
+    }
+    
+    .case-studies-subtitle {
+      max-width: 20rem;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--muted-foreground);
+      text-align: right;
+      line-height: 1.6;
+      display: none;
+    }
+    
+    @media (min-width: 768px) {
+      .case-studies-subtitle {
+        display: block;
+      }
+    }
+    
+    .case-studies-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      grid-auto-rows: 180px;
+    }
+    
+    @media (min-width: 768px) {
+      .case-studies-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 24px;
+        grid-auto-rows: 200px;
+      }
+    }
+    
+    .case-card {
+      position: relative;
+      border: 1px solid rgba(64, 64, 64, 0.4);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.5s ease;
+      cursor: pointer;
+      overflow: hidden;
+    }
+    
+    .case-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(232, 123, 53, 0.05);
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+    
+    .case-card:hover::before {
+      opacity: 1;
+    }
+    
+    .case-card:hover {
+      border-color: rgba(232, 123, 53, 0.6);
+    }
+    
+    .case-card.span-2-2 {
+      grid-column: span 2;
+      grid-row: span 2;
+    }
+    
+    .case-card.span-1-2 {
+      grid-row: span 2;
+    }
+    
+    .case-card.span-2-1 {
+      grid-column: span 2;
+    }
+    
+    .case-category {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted-foreground);
+      position: relative;
+      z-index: 1;
+    }
+    
+    .case-title {
+      font-family: var(--font-display);
+      font-size: clamp(1.5rem, 4vw, 2.5rem);
+      letter-spacing: -0.02em;
+      margin-top: 12px;
+      transition: color 0.3s ease;
+      position: relative;
+      z-index: 1;
+    }
+    
+    .case-card:hover .case-title {
+      color: var(--accent);
+    }
+    
+    .case-description {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--muted-foreground);
+      line-height: 1.6;
+      max-width: 280px;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: all 0.5s ease;
+      position: relative;
+      z-index: 1;
+    }
+    
+    .case-card:hover .case-description {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    .case-number {
+      position: absolute;
+      bottom: 16px;
+      right: 16px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: rgba(140, 140, 140, 0.4);
+      transition: color 0.3s ease;
+    }
+    
+    .case-card:hover .case-number {
+      color: var(--accent);
+    }
+    
+    .case-corner {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 48px;
+      height: 48px;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+    
+    .case-card:hover .case-corner {
+      opacity: 1;
+    }
+    
+    .case-corner::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 100%;
+      height: 1px;
+      background: var(--accent);
+    }
+    
+    .case-corner::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 1px;
+      height: 100%;
+      background: var(--accent);
+    }
+    
+    /* Articles Section */
+    #articles {
+      padding-right: 0;
+    }
+    
+    .articles-scroll {
+      display: flex;
+      gap: 32px;
+      overflow-x: auto;
+      padding-bottom: 32px;
+      padding-right: 48px;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    
+    .articles-scroll::-webkit-scrollbar {
+      display: none;
+    }
+    
+    .article-card {
+      flex-shrink: 0;
+      width: 320px;
+      position: relative;
+      transition: transform 0.5s ease;
+    }
+    
+    .article-card:hover {
+      transform: translateY(-8px);
+    }
+    
+    .article-inner {
+      position: relative;
+      background: var(--card);
+      border: 1px solid rgba(64, 64, 64, 0.5);
+      padding: 32px;
+    }
+    
+    .article-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 32px;
+    }
+    
+    .article-number {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.3em;
+      color: var(--muted-foreground);
+    }
+    
+    .article-type {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: rgba(140, 140, 140, 0.6);
+    }
+    
+    .article-title {
+      font-family: var(--font-display);
+      font-size: 2.5rem;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+      transition: color 0.3s ease;
+    }
+    
+    .article-card:hover .article-title {
+      color: var(--accent);
+    }
+    
+    .article-line {
+      width: 48px;
+      height: 1px;
+      background: rgba(232, 123, 53, 0.6);
+      margin-bottom: 24px;
+      transition: width 0.5s ease;
+    }
+    
+    .article-card:hover .article-line {
+      width: 100%;
+    }
+    
+    .article-excerpt {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--muted-foreground);
+      line-height: 1.6;
+    }
+    
+    .article-shadow {
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      transform: translate(4px, 4px);
+      background: rgba(232, 123, 53, 0.05);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    
+    .article-card:hover .article-shadow {
+      opacity: 1;
+    }
+    
+    /* Interactive Section */
+    .interactive-description {
+      margin-top: 24px;
+      max-width: 32rem;
+      font-family: var(--font-mono);
+      font-size: 14px;
+      color: var(--muted-foreground);
+      line-height: 1.8;
+    }
+    
+    .interactive-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 24px;
+      margin-top: 64px;
+    }
+    
+    @media (min-width: 768px) {
+      .interactive-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    
+    @media (min-width: 1024px) {
+      .interactive-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+    
+    .interactive-card {
+      position: relative;
+      border: 1px solid rgba(64, 64, 64, 0.4);
+      padding: 32px;
+      transition: all 0.5s ease;
+      cursor: pointer;
+    }
+    
+    .interactive-card:hover {
+      border-color: rgba(232, 123, 53, 0.6);
+      background: rgba(232, 123, 53, 0.05);
+    }
+    
+    .interactive-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+    
+    .interactive-icon {
+      font-family: var(--font-display);
+      font-size: 2.5rem;
+      color: var(--accent);
+    }
+    
+    .interactive-status {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: rgba(140, 140, 140, 0.6);
+      border: 1px solid rgba(64, 64, 64, 0.4);
+      padding: 4px 8px;
+    }
+    
+    .interactive-title {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      letter-spacing: -0.02em;
+      margin-bottom: 12px;
+      transition: color 0.3s ease;
+    }
+    
+    .interactive-card:hover .interactive-title {
+      color: var(--accent);
+    }
+    
+    .interactive-text {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--muted-foreground);
+      line-height: 1.6;
+    }
+    
+    .interactive-number {
+      position: absolute;
+      bottom: 16px;
+      right: 16px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: rgba(140, 140, 140, 0.4);
+      transition: color 0.3s ease;
+    }
+    
+    .interactive-card:hover .interactive-number {
+      color: var(--accent);
+    }
+    
+    /* Footer Section */
+    #footer {
+      border-top: 1px solid rgba(64, 64, 64, 0.3);
+    }
+    
+    .footer-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 32px;
+      margin-top: 64px;
+    }
+    
+    @media (min-width: 768px) {
+      .footer-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 48px;
+      }
+    }
+    
+    @media (min-width: 1024px) {
+      .footer-grid {
+        grid-template-columns: repeat(6, 1fr);
+      }
+    }
+    
+    .footer-column h4 {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.3em;
+      color: var(--muted-foreground);
+      margin-bottom: 16px;
+    }
+    
+    .footer-column ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    .footer-column li {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.8);
+    }
+    
+    .footer-bottom {
+      margin-top: 96px;
+      padding-top: 32px;
+      border-top: 1px solid rgba(64, 64, 64, 0.2);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    
+    @media (min-width: 768px) {
+      .footer-bottom {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+      }
+    }
+    
+    .footer-bottom p {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--muted-foreground);
+    }
+    
+    .footer-bottom .project-name {
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    
+    /* Animations */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(40px);
+    }
+    
+    .slide-in-left {
+      opacity: 0;
+      transform: translateX(-60px);
+    }
+    
+    .slide-in-right {
+      opacity: 0;
+      transform: translateX(60px);
+    }
+  </style>
+</head>
+<body>
+  <!-- Grid Background -->
+  <div class="grid-bg" aria-hidden="true"></div>
+  
+  <!-- Side Navigation -->
+  <nav class="side-nav">
+    <div class="nav-items">
+      <button class="nav-item active" data-target="hero">
+        <span class="nav-dot"></span>
+        <span class="nav-label">Home</span>
+      </button>
+      <button class="nav-item" data-target="about">
+        <span class="nav-dot"></span>
+        <span class="nav-label">About</span>
+      </button>
+      <button class="nav-item" data-target="themes">
+        <span class="nav-dot"></span>
+        <span class="nav-label">Themes</span>
+      </button>
+      <button class="nav-item" data-target="case-studies">
+        <span class="nav-dot"></span>
+        <span class="nav-label">Cases</span>
+      </button>
+      <button class="nav-item" data-target="articles">
+        <span class="nav-dot"></span>
+        <span class="nav-label">Articles</span>
+      </button>
+      <button class="nav-item" data-target="interactive">
+        <span class="nav-dot"></span>
+        <span class="nav-label">Interactive</span>
+      </button>
+      <button class="nav-item" data-target="footer">
+        <span class="nav-dot"></span>
+        <span class="nav-label">Credits</span>
+      </button>
+    </div>
+  </nav>
+  
+  <!-- Main Content -->
+  <main class="main-content">
+    
+    <!-- Hero Section -->
+    <section id="hero">
+      <div class="hero-label">ACADEMIC STUDY</div>
+      
+      <div class="hero-content">
+        <div class="split-flap-container">
+          <div class="split-flap-text" id="title-1">DIVERSITY</div>
+          <div class="split-flap-text" id="title-2">INEQUALITY</div>
+          <div class="split-flap-text" id="title-3">INJUSTICE</div>
+        </div>
+        
+        <p class="hero-description">
+          Exploring how power, privilege and exclusion shape people's lives across different societies. A university creative assignment examining structural injustice and lived experience.
+        </p>
+        
+        <div class="hero-buttons">
+          <a href="#case-studies" class="btn-primary">
+            <span>Explore Case Studies</span>
+            <span class="chevron"></span>
+          </a>
+          <a href="#about" class="btn-secondary">About Project</a>
+        </div>
+      </div>
+      
+      <div class="hero-tag">University Creative Assignment</div>
+    </section>
+    
+    <!-- About Section -->
+    <section id="about">
+      <div class="slide-in-left">
+        <span class="section-label">01 / About</span>
+        <h2 class="section-title">THE PROJECT</h2>
+      </div>
+      
+      <div class="about-grid fade-in">
+        <div class="about-text">
+          <p>This website was created as part of a university creative assignment examining the interconnected themes of diversity, inequality, and injustice in contemporary society.</p>
+          <p>Through research, case studies, and critical analysis, this project explores how structural inequalities manifest across different dimensions of society—from economic disparities to institutional discrimination—and how these systems impact the lived experiences of individuals and communities.</p>
+          <p>The goal is to foster understanding, encourage critical thinking, and inspire meaningful dialogue about creating a more equitable world.</p>
+        </div>
+        
+        <div class="focus-areas">
+          <h3>Key Focus Areas</h3>
+          <ul class="focus-list">
+            <li class="focus-item">
+              <span class="focus-number">01</span>
+              <span class="focus-text">Social inequality and class structures</span>
+            </li>
+            <li class="focus-item">
+              <span class="focus-number">02</span>
+              <span class="focus-text">Discrimination and systemic exclusion</span>
+            </li>
+            <li class="focus-item">
+              <span class="focus-number">03</span>
+              <span class="focus-text">Structural injustice in institutions</span>
+            </li>
+            <li class="focus-item">
+              <span class="focus-number">04</span>
+              <span class="focus-text">Unequal access to opportunities</span>
+            </li>
+            <li class="focus-item">
+              <span class="focus-number">05</span>
+              <span class="focus-text">Lived experiences of marginalized groups</span>
+            </li>
+            <li class="focus-item">
+              <span class="focus-number">06</span>
+              <span class="focus-text">Power dynamics and privilege</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Themes Section -->
+    <section id="themes">
+      <div class="slide-in-left">
+        <span class="section-label">02 / Themes</span>
+        <h2 class="section-title">KEY THEMES</h2>
+      </div>
+      
+      <div class="themes-container">
+        <article class="theme-item align-left slide-in-left">
+          <span class="theme-number">01 / SOCIAL</span>
+          <h3 class="theme-title"><span class="highlight">SOCIAL</span> INEQUALITY</h3>
+          <p class="theme-description">The unequal distribution of resources, opportunities, and privileges within society based on social position.</p>
+          <div class="theme-divider"></div>
+        </article>
+        
+        <article class="theme-item align-right slide-in-right">
+          <span class="theme-number">02 / RACIAL</span>
+          <h3 class="theme-title"><span class="highlight">RACIAL</span> INJUSTICE</h3>
+          <p class="theme-description">Systemic discrimination and prejudice based on race and ethnicity that perpetuates disparities across generations.</p>
+          <div class="theme-divider"></div>
+        </article>
+        
+        <article class="theme-item align-left slide-in-left">
+          <span class="theme-number">03 / GENDER</span>
+          <h3 class="theme-title">GENDER <span class="highlight">INEQUALITY</span></h3>
+          <p class="theme-description">Disparities in rights, opportunities, and treatment based on gender identity and expression.</p>
+          <div class="theme-divider"></div>
+        </article>
+        
+        <article class="theme-item align-right slide-in-right">
+          <span class="theme-number">04 / CLASS</span>
+          <h3 class="theme-title">CLASS <span class="highlight">DISPARITY</span></h3>
+          <p class="theme-description">Economic stratification that creates barriers to mobility and concentrates wealth among few.</p>
+          <div class="theme-divider"></div>
+        </article>
+        
+        <article class="theme-item align-left slide-in-left">
+          <span class="theme-number">05 / INSTITUTIONAL</span>
+          <h3 class="theme-title"><span class="highlight">INSTITUTIONAL</span> DISCRIMINATION</h3>
+          <p class="theme-description">Embedded biases within organizations and systems that disadvantage certain groups systematically.</p>
+          <div class="theme-divider"></div>
+        </article>
+        
+        <article class="theme-item align-right slide-in-right">
+          <span class="theme-number">06 / ACCESS</span>
+          <h3 class="theme-title">ACCESS <span class="highlight">BARRIERS</span></h3>
+          <p class="theme-description">Obstacles to education, healthcare, and opportunity that disproportionately affect marginalized communities.</p>
+          <div class="theme-divider"></div>
+        </article>
+      </div>
+    </section>
+    
+    <!-- Case Studies Section -->
+    <section id="case-studies">
+      <div class="case-studies-header">
+        <div class="slide-in-left">
+          <span class="section-label">03 / Case Studies</span>
+          <h2 class="section-title">REAL-WORLD EXAMPLES</h2>
+        </div>
+        <p class="case-studies-subtitle">Examining how inequality and injustice manifest in different aspects of society.</p>
+      </div>
+      
+      <div class="case-studies-grid fade-in">
+        <article class="case-card span-2-2">
+          <div>
+            <span class="case-category">Economic Inequality</span>
+            <h3 class="case-title">Income Gap</h3>
+          </div>
+          <p class="case-description">The widening disparity between the highest and lowest earners in developed nations.</p>
+          <span class="case-number">01</span>
+          <div class="case-corner"></div>
+        </article>
+        
+        <article class="case-card">
+          <div>
+            <span class="case-category">Opportunity Inequality</span>
+            <h3 class="case-title">Education Access</h3>
+          </div>
+          <p class="case-description">Barriers to quality education based on socioeconomic status and geography.</p>
+          <span class="case-number">02</span>
+          <div class="case-corner"></div>
+        </article>
+        
+        <article class="case-card span-1-2">
+          <div>
+            <span class="case-category">Discrimination</span>
+            <h3 class="case-title">Workplace Bias</h3>
+          </div>
+          <p class="case-description">Systemic discrimination in hiring, promotion, and compensation practices.</p>
+          <span class="case-number">03</span>
+          <div class="case-corner"></div>
+        </article>
+        
+        <article class="case-card">
+          <div>
+            <span class="case-category">Social Injustice</span>
+            <h3 class="case-title">Housing Crisis</h3>
+          </div>
+          <p class="case-description">Discriminatory practices in housing access and neighborhood segregation.</p>
+          <span class="case-number">04</span>
+          <div class="case-corner"></div>
+        </article>
+        
+        <article class="case-card span-2-1">
+          <div>
+            <span class="case-category">Systemic Inequality</span>
+            <h3 class="case-title">Criminal Justice</h3>
+          </div>
+          <p class="case-description">Disproportionate impacts of the justice system on marginalized communities.</p>
+          <span class="case-number">05</span>
+          <div class="case-corner"></div>
+        </article>
+        
+        <article class="case-card">
+          <div>
+            <span class="case-category">International Inequality</span>
+            <h3 class="case-title">Global Divide</h3>
+          </div>
+          <p class="case-description">Economic and developmental disparities between nations and regions.</p>
+          <span class="case-number">06</span>
+          <div class="case-corner"></div>
+        </article>
+      </div>
+    </section>
+    
+    <!-- Articles Section -->
+    <section id="articles">
+      <div class="slide-in-left" style="padding-right: 48px;">
+        <span class="section-label">04 / Insights</span>
+        <h2 class="section-title">ARTICLES</h2>
+      </div>
+      
+      <div class="articles-scroll fade-in" style="margin-top: 64px;">
+        <article class="article-card">
+          <div class="article-inner">
+            <div class="article-header">
+              <span class="article-number">No. 01</span>
+              <span class="article-type">Research</span>
+            </div>
+            <h3 class="article-title">The Wealth Gap</h3>
+            <div class="article-line"></div>
+            <p class="article-excerpt">How intergenerational wealth transfers perpetuate economic inequality across communities.</p>
+          </div>
+          <div class="article-shadow"></div>
+        </article>
+        
+        <article class="article-card">
+          <div class="article-inner">
+            <div class="article-header">
+              <span class="article-number">No. 02</span>
+              <span class="article-type">Analysis</span>
+            </div>
+            <h3 class="article-title">Systemic Barriers</h3>
+            <div class="article-line"></div>
+            <p class="article-excerpt">Understanding the institutional mechanisms that create and maintain social disparities.</p>
+          </div>
+          <div class="article-shadow"></div>
+        </article>
+        
+        <article class="article-card">
+          <div class="article-inner">
+            <div class="article-header">
+              <span class="article-number">No. 03</span>
+              <span class="article-type">Study</span>
+            </div>
+            <h3 class="article-title">Voices Unheard</h3>
+            <div class="article-line"></div>
+            <p class="article-excerpt">Lived experiences of marginalized communities navigating structural injustice.</p>
+          </div>
+          <div class="article-shadow"></div>
+        </article>
+        
+        <article class="article-card">
+          <div class="article-inner">
+            <div class="article-header">
+              <span class="article-number">No. 04</span>
+              <span class="article-type">Report</span>
+            </div>
+            <h3 class="article-title">Digital Divide</h3>
+            <div class="article-line"></div>
+            <p class="article-excerpt">Technology access as a new frontier of inequality in the modern era.</p>
+          </div>
+          <div class="article-shadow"></div>
+        </article>
+        
+        <article class="article-card">
+          <div class="article-inner">
+            <div class="article-header">
+              <span class="article-number">No. 05</span>
+              <span class="article-type">Investigation</span>
+            </div>
+            <h3 class="article-title">Health Disparities</h3>
+            <div class="article-line"></div>
+            <p class="article-excerpt">How socioeconomic factors determine health outcomes and access to care.</p>
+          </div>
+          <div class="article-shadow"></div>
+        </article>
+      </div>
+    </section>
+    
+    <!-- Interactive Section -->
+    <section id="interactive">
+      <div class="slide-in-left">
+        <span class="section-label">05 / Interactive</span>
+        <h2 class="section-title">EXPLORE MORE</h2>
+        <p class="interactive-description">Interactive tools to deepen your understanding of diversity, inequality, and injustice in society.</p>
+      </div>
+      
+      <div class="interactive-grid fade-in">
+        <article class="interactive-card">
+          <div class="interactive-header">
+            <span class="interactive-icon">?</span>
+            <span class="interactive-status">Coming Soon</span>
+          </div>
+          <h3 class="interactive-title">Quiz</h3>
+          <p class="interactive-text">Test your understanding of inequality concepts and social justice issues.</p>
+          <span class="interactive-number">01</span>
+        </article>
+        
+        <article class="interactive-card">
+          <div class="interactive-header">
+            <span class="interactive-icon">—</span>
+            <span class="interactive-status">Coming Soon</span>
+          </div>
+          <h3 class="interactive-title">Timeline</h3>
+          <p class="interactive-text">Explore key moments in the history of civil rights and social movements.</p>
+          <span class="interactive-number">02</span>
+        </article>
+        
+        <article class="interactive-card">
+          <div class="interactive-header">
+            <span class="interactive-icon">≡</span>
+            <span class="interactive-status">Coming Soon</span>
+          </div>
+          <h3 class="interactive-title">Comparison Charts</h3>
+          <p class="interactive-text">Compare inequality metrics across different countries and demographics.</p>
+          <span class="interactive-number">03</span>
+        </article>
+        
+        <article class="interactive-card">
+          <div class="interactive-header">
+            <span class="interactive-icon">◎</span>
+            <span class="interactive-status">Coming Soon</span>
+          </div>
+          <h3 class="interactive-title">Interactive Map</h3>
+          <p class="interactive-text">Visualize global inequality data and regional disparities.</p>
+          <span class="interactive-number">04</span>
+        </article>
+        
+        <article class="interactive-card">
+          <div class="interactive-header">
+            <span class="interactive-icon">%</span>
+            <span class="interactive-status">Coming Soon</span>
+          </div>
+          <h3 class="interactive-title">Statistics</h3>
+          <p class="interactive-text">Explore real-time data on social inequality indicators worldwide.</p>
+          <span class="interactive-number">05</span>
+        </article>
+      </div>
+    </section>
+    
+    <!-- Footer Section -->
+    <section id="footer">
+      <div class="slide-in-left">
+        <span class="section-label">06 / Credits</span>
+        <h2 class="section-title">REFERENCES</h2>
+      </div>
+      
+      <div class="footer-grid fade-in">
+        <div class="footer-column">
+          <h4>Project</h4>
+          <ul>
+            <li>University Assignment</li>
+            <li>Creative Research</li>
+          </ul>
+        </div>
+        
+        <div class="footer-column">
+          <h4>Topics</h4>
+          <ul>
+            <li>Diversity</li>
+            <li>Inequality</li>
+            <li>Injustice</li>
+          </ul>
+        </div>
+        
+        <div class="footer-column">
+          <h4>Sources</h4>
+          <ul>
+            <li>Academic Journals</li>
+            <li>Research Papers</li>
+            <li>Case Studies</li>
+          </ul>
+        </div>
+        
+        <div class="footer-column">
+          <h4>Built With</h4>
+          <ul>
+            <li>HTML5</li>
+            <li>CSS3</li>
+            <li>JavaScript</li>
+          </ul>
+        </div>
+        
+        <div class="footer-column">
+          <h4>Typography</h4>
+          <ul>
+            <li>Bebas Neue</li>
+            <li>IBM Plex Sans</li>
+            <li>IBM Plex Mono</li>
+          </ul>
+        </div>
+        
+        <div class="footer-column">
+          <h4>Year</h4>
+          <ul>
+            <li>2026</li>
+            <li>Academic Term</li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="footer-bottom fade-in">
+        <p class="project-name">University Creative Assignment - Diversity, Inequality and Injustice</p>
+        <p>&copy; 2026 Andrei Gosman</p>
+      </div>
+    </section>
+    
+  </main>
+  
+  <script>
+    // Register GSAP ScrollTrigger
+    gsap.registerPlugin(ScrollTrigger);
+    
+    // Split Flap Animation
+    function animateSplitFlap(elementId, finalText, delay = 0) {
+      const element = document.getElementById(elementId);
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+      let iterations = 0;
+      const maxIterations = 20;
+      
+      setTimeout(() => {
+        const interval = setInterval(() => {
+          element.textContent = finalText
+            .split('')
+            .map((char, index) => {
+              if (index < iterations / 2) return finalText[index];
+              return chars[Math.floor(Math.random() * chars.length)];
+            })
+            .join('');
+          
+          iterations++;
+          if (iterations > maxIterations) {
+            clearInterval(interval);
+            element.textContent = finalText;
+          }
+        }, 50);
+      }, delay);
+    }
+    
+    // Initialize split flap on load
+    window.addEventListener('load', () => {
+      animateSplitFlap('title-1', 'DIVERSITY', 300);
+      animateSplitFlap('title-2', 'INEQUALITY', 600);
+      animateSplitFlap('title-3', 'INJUSTICE', 900);
+    });
+    
+    // Navigation
+    const navItems = document.querySelectorAll('.nav-item');
+    const sections = ['hero', 'about', 'themes', 'case-studies', 'articles', 'interactive', 'footer'];
+    
+    navItems.forEach(item => {
+      item.addEventListener('click', () => {
+        const target = item.dataset.target;
+        const element = document.getElementById(target);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      });
+    });
+    
+    // Active section detection
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          navItems.forEach(item => {
+            item.classList.remove('active');
+            if (item.dataset.target === entry.target.id) {
+              item.classList.add('active');
+            }
+          });
+        }
+      });
+    }, { threshold: 0.3 });
+    
+    sections.forEach(id => {
+      const element = document.getElementById(id);
+      if (element) observer.observe(element);
+    });
+    
+    // GSAP Animations
+    // Slide in left animations
+    gsap.utils.toArray('.slide-in-left').forEach(element => {
+      gsap.fromTo(element, 
+        { x: -60, opacity: 0 },
+        {
+          x: 0,
+          opacity: 1,
+          duration: 1,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: element,
+            start: 'top 85%',
+            toggleActions: 'play none none reverse'
+          }
+        }
+      );
+    });
+    
+    // Slide in right animations
+    gsap.utils.toArray('.slide-in-right').forEach(element => {
+      gsap.fromTo(element, 
+        { x: 60, opacity: 0 },
+        {
+          x: 0,
+          opacity: 1,
+          duration: 1,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: element,
+            start: 'top 85%',
+            toggleActions: 'play none none reverse'
+          }
+        }
+      );
+    });
+    
+    // Fade in animations
+    gsap.utils.toArray('.fade-in').forEach(element => {
+      gsap.fromTo(element, 
+        { y: 40, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 1,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: element,
+            start: 'top 85%',
+            toggleActions: 'play none none reverse'
+          }
+        }
+      );
+    });
+    
+    // Hero parallax effect
+    gsap.to('.hero-content', {
+      y: -100,
+      opacity: 0,
+      scrollTrigger: {
+        trigger: '#hero',
+        start: 'top top',
+        end: 'bottom top',
+        scrub: 1
+      }
+    });
+    
+    // Case study cards stagger
+    gsap.fromTo('.case-card', 
+      { y: 60, opacity: 0 },
+      {
+        y: 0,
+        opacity: 1,
+        duration: 0.8,
+        stagger: 0.1,
+        ease: 'power3.out',
+        scrollTrigger: {
+          trigger: '.case-studies-grid',
+          start: 'top 90%',
+          toggleActions: 'play none none reverse'
+        }
+      }
+    );
+    
+    // Article cards stagger
+    gsap.fromTo('.article-card', 
+      { x: -100, opacity: 0 },
+      {
+        x: 0,
+        opacity: 1,
+        duration: 0.8,
+        stagger: 0.2,
+        ease: 'power3.out',
+        scrollTrigger: {
+          trigger: '.articles-scroll',
+          start: 'top 90%',
+          toggleActions: 'play none none reverse'
+        }
+      }
+    );
+    
+    // Interactive cards stagger
+    gsap.fromTo('.interactive-card', 
+      { y: 40, opacity: 0 },
+      {
+        y: 0,
+        opacity: 1,
+        duration: 0.8,
+        stagger: 0.1,
+        ease: 'power3.out',
+        scrollTrigger: {
+          trigger: '.interactive-grid',
+          start: 'top 85%',
+          toggleActions: 'play none none reverse'
+        }
+      }
+    );
+    
+    // Footer columns stagger
+    gsap.fromTo('.footer-column', 
+      { y: 40, opacity: 0 },
+      {
+        y: 0,
+        opacity: 1,
+        duration: 0.8,
+        stagger: 0.1,
+        ease: 'power3.out',
+        scrollTrigger: {
+          trigger: '.footer-grid',
+          start: 'top 85%',
+          toggleActions: 'play none none reverse'
+        }
+      }
+    );
+  </script>
+</body>
+</html>
